@@ -865,76 +865,54 @@ html.safari-character-canvas .curriculum-character video{display:none!important}
 html.safari-character-canvas .character-canvas{display:block!important;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 </style>
 
+
+
+
+<style id="audiohub-safari-character-fix">
+/* Safari: do NOT use screen blending or canvas matte removal.
+   Preserve the original alpha channel of the transparent WebM. */
+.safari-video-fix .character-video,
+.safari-video-fix .curriculum-character video{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  mix-blend-mode:normal !important;
+  -webkit-mix-blend-mode:normal !important;
+  background:transparent !important;
+  filter:none !important;
+  isolation:auto !important;
+  -webkit-backface-visibility:visible !important;
+  backface-visibility:visible !important;
+}
+
+/* Safari sometimes needs the video to have an explicit rendering box. */
+.character-video{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:transparent;
+}
+</style>
 <script>
 (function(){
-  var ua=navigator.userAgent||'';
-  var isSafari=/Safari/i.test(ua)&&!/Chrome|CriOS|Android|Edg|OPR|FxiOS|Firefox/i.test(ua);
-  if(!isSafari)return;
-  document.documentElement.classList.add('safari-character-canvas');
+  var ua = navigator.userAgent || "";
+  var safari =
+    /Safari/i.test(ua) &&
+    !/Chrome|CriOS|Android|Edg|OPR|FxiOS|Firefox/i.test(ua);
 
-  function setup(host){
-    var video=host.querySelector('video');
-    if(!video)return;
-    var canvas=document.createElement('canvas');
-    canvas.className='character-canvas';
-    canvas.setAttribute('aria-hidden','true');
-    host.appendChild(canvas);
-    var ctx=canvas.getContext('2d',{willReadFrequently:true});
-    if(!ctx)return;
-    var running=false, last=0;
+  if (safari) document.documentElement.classList.add("safari-video-fix");
 
-    function resize(){
-      if(!video.videoWidth||!video.videoHeight)return;
-      /* Process at a capped resolution: visually sharp enough for the character,
-         but light enough for iPhone Safari. */
-      var maxW=520;
-      var scale=Math.min(1,maxW/video.videoWidth);
-      canvas.width=Math.max(1,Math.round(video.videoWidth*scale));
-      canvas.height=Math.max(1,Math.round(video.videoHeight*scale));
-    }
-
-    function draw(now){
-      if(!running)return;
-      if(now-last<45){requestAnimationFrame(draw);return;}
-      last=now;
-      if(video.readyState<2){requestAnimationFrame(draw);return;}
-      if(canvas.width!==Math.max(1,Math.round(video.videoWidth*Math.min(1,520/video.videoWidth))))resize();
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.drawImage(video,0,0,canvas.width,canvas.height);
-      var image;
-      try{image=ctx.getImageData(0,0,canvas.width,canvas.height)}catch(e){requestAnimationFrame(draw);return;}
-      var d=image.data;
-      for(var i=0;i<d.length;i+=4){
-        var r=d[i],g=d[i+1],b=d[i+2];
-        var max=Math.max(r,g,b), min=Math.min(r,g,b);
-        var neutral=max-min<16;
-        if(neutral&&max<42){
-          d[i+3]=0;
-        }else if(neutral&&max<78){
-          d[i+3]=Math.max(0,Math.min(255,Math.round((max-42)*7.1)));
-        }
-      }
-      ctx.putImageData(image,0,0);
-      requestAnimationFrame(draw);
-    }
-
-    function start(){
-      if(running)return;
-      running=true;
-      resize();
-      video.muted=true;
-      video.playsInline=true;
-      video.play().catch(function(){});
-      requestAnimationFrame(draw);
-    }
-    video.addEventListener('loadedmetadata',resize,{passive:true});
-    if(video.readyState>=1)resize();
-    if(video.readyState>=2)start();
-    else video.addEventListener('canplay',start,{once:true});
-  }
-
-  document.addEventListener('DOMContentLoaded',function(){
-    document.querySelectorAll('.producer,.curriculum-character').forEach(setup);
+  document.addEventListener("DOMContentLoaded", function(){
+    document.querySelectorAll(".character-video, .curriculum-character video")
+      .forEach(function(v){
+        v.muted = true;
+        v.defaultMuted = true;
+        v.playsInline = true;
+        v.setAttribute("playsinline", "");
+        v.setAttribute("webkit-playsinline", "");
+        v.play().catch(function(){});
+      });
   });
 })();
 </script>
