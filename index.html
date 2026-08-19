@@ -1746,9 +1746,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // Trusting a plain feature-detect the other direction (assume canvas always works) broke Chrome
   // when testing via file://. So instead we identify genuine Safari directly — the one browser
   // that needs the canvas path — and give every other engine the native-video path unconditionally.
+  // Every browser app on iOS/iPadOS (Chrome, Firefox, Edge, Safari — doesn't matter what the UA
+  // brand says) is required by Apple to run on the same underlying WebKit engine, which cannot
+  // decode WebM/VP9 at all. So on iOS we always need the canvas+H.264 path, regardless of which
+  // browser is reporting. Detected via UA (iPhone/iPad/iPod) plus the iPadOS 13+ desktop-UA case
+  // (reports as "MacIntel" but has touch support, unlike a real Mac).
+  function isIOS(){
+    var ua = navigator.userAgent || '';
+    var isIPadOS13Plus = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    return /iPad|iPhone|iPod/.test(ua) || isIPadOS13Plus;
+  }
+
   function isRealSafari(){
     var ua = navigator.userAgent || '';
     var vendor = navigator.vendor || '';
+    if (isIOS()) return true; // all iOS browsers share WebKit's WebM limitation, so they all need canvas path
     var isChromiumOrOtherEngine = /Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|OPR\/|Firefox|Android/.test(ua);
     return vendor.indexOf('Apple') !== -1 && /Safari/.test(ua) && !isChromiumOrOtherEngine;
   }
@@ -1787,7 +1799,17 @@ document.addEventListener('DOMContentLoaded', function () {
   alphaSource.setAttribute('webkit-playsinline', '');
   alphaSource.setAttribute('preload', 'auto');
   alphaSource.autoplay = true;
-  alphaSource.style.display = 'none';
+  // NOT display:none — iOS WebKit is documented to stop updating decoded video frames on
+  // display:none elements even while .play() reports success, which would silently freeze
+  // canvas.drawImage() capture from this element on iPhone/iPad. Keep it technically "rendered"
+  // (off-screen, near-invisible, non-interactive) instead, which iOS keeps decoding normally.
+  alphaSource.style.position = 'fixed';
+  alphaSource.style.left = '-9999px';
+  alphaSource.style.top = '0';
+  alphaSource.style.width = '1px';
+  alphaSource.style.height = '1px';
+  alphaSource.style.opacity = '0.01';
+  alphaSource.style.pointerEvents = 'none';
   alphaSource.setAttribute('aria-hidden', 'true');
   var mp4Source = document.createElement('source');
   mp4Source.src = 'assets/character-alpha.mp4';
