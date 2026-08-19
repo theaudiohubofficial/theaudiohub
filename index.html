@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Audio Hub | Music Production &amp; Sound Engineering Academy Chennai</title>
 <meta name="description" content="The Audio Hub — Professional Music Production & Sound Engineering Academy in Chennai.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -463,6 +463,7 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
   transition:opacity .45s ease,transform .65s cubic-bezier(.16,1,.3,1);
 }
 .curriculum-character video,
+.curriculum-character canvas,
 .curriculum-character img{
   width:100%;
   height:100%;
@@ -520,7 +521,8 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
   transform:translateX(48px) translateY(14px) scale(.95);
   transition:opacity .4s ease,transform .6s cubic-bezier(.16,1,.3,1);
 }
-.curriculum-character video{
+.curriculum-character video,
+.curriculum-character canvas{
   width:100%;height:100%;object-fit:contain;display:block;
   background:transparent!important;
 }
@@ -1035,278 +1037,14 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
 }
 </style>
 
-<style id="audiohub-safari-and-mobile-fix">
-/* =========================================================================
-   THE AUDIO HUB — Safari character fix + consolidated mobile pass
-   -------------------------------------------------------------------------
-   This block is deliberately the LAST style block in the document head. Several mobile
-   breakpoints for the same elements (.hero-scene/.producer, .curriculum-
-   character, .founder, etc.) were previously defined across multiple
-   earlier style-tag patches with inconsistent breakpoints, which is why
-   phones were rendering the leftover values from whichever rule happened
-   to lose the cascade. Everything below is the single, final word for
-   those properties on tablet/phone. Nothing here touches desktop Chrome.
-   ========================================================================= */
-
-/* -------------------------------------------------------------------
-   A) SAFARI CHARACTER COMPOSITING FIX
-   character-transparent.webm carries a real alpha channel encoded as
-   VP8/VP9. Chrome and Firefox composite that alpha channel natively, so
-   the character floats over the scene correctly. Safari (desktop AND
-   the WKWebView engine every browser on iOS is forced to use) does not
-   decode WebM alpha and instead paints the video's opaque fallback
-   layer, which is authored as solid black — that is the "black box
-   behind the character" bug.
-   Fix: on WebKit only (detected via the -webkit-touch-callout feature
-   query, which Chrome/Firefox do not implement), screen-blend the video
-   against the dark scene behind it. Screen-blending true black (0,0,0)
-   against a near-black background is visually a no-op — the black
-   canvas disappears — while the character's actual pixels pass through
-   almost unchanged, because screen(x, ~0) ≈ x. No new video asset is
-   required and Chrome/Firefox are completely unaffected, since they
-   never match this @supports test.
-   ------------------------------------------------------------------- */
-@supports (-webkit-touch-callout: none) {
-  .character-video,
-  .curriculum-character video {
-    mix-blend-mode: screen;
-    background: transparent;
-  }
+<style id="character-safari-alpha-only">
+.character-video,
+.curriculum-character video,
+.curriculum-character canvas{
+  background:transparent !important;
 }
-
-/* -------------------------------------------------------------------
-   B) GLOBAL MOBILE SAFETY
-   ------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-  html, body { overflow-x: hidden; }
-}
-
-/* -------------------------------------------------------------------
-   C) NAVIGATION — safe-area padding + tidier dropdown link styling.
-   The open/close toggle itself is left to the existing script (now
-   improved alongside this stylesheet — see the updated <script> near
-   the mobile menu button), so this only styles what the script does
-   not set inline.
-   ------------------------------------------------------------------- */
-.nav {
-  padding-left: calc(13px + env(safe-area-inset-left));
-  padding-right: calc(13px + env(safe-area-inset-right));
-}
-@media (max-width: 980px) {
-  .nav-links a {
-    display: block;
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 14px;
-    border-radius: 12px;
-    text-align: center;
-  }
-  .nav-links a.nav-cta { margin-top: 6px; }
-}
-
-/* -------------------------------------------------------------------
-   D) HERO 3D SCENE + CHARACTER — fluid proportions instead of the old
-   fixed 300x430px character crammed into a fixed 455px scene. Sizing
-   the character as a percentage of the scene means it always fits,
-   at every phone width, instead of only at the one width it was
-   hand-tuned for.
-   ------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-  .hero-scene { height: 560px; }
-}
-@media (max-width: 820px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 44px; }
-  .hero-scene {
-    width: 100%;
-    height: clamp(360px, 72vw, 520px);
-    transform: none;
-    margin: 0 auto;
-  }
-  .room { inset: 6% 4% 6% 2%; }
-  .producer { width: 38%; height: 78%; right: 8%; bottom: 6%; transform: none; }
-  .mixer3d { left: 4%; right: 4%; height: clamp(90px, 16vw, 150px); }
-  .interface.if-a { transform: scale(.85) rotate(7deg) translateZ(100px); top: 9%; right: -3%; }
-  .interface.if-b { transform: scale(.85) rotate(-8deg) translateZ(90px); top: 46%; left: -3%; }
-  .interface.if-c { transform: scale(.8) rotate(4deg) translateZ(70px); bottom: 5%; right: 1%; }
-}
-@media (max-width: 620px) {
-  .hero { padding-top: 108px; }
-  .hero h1 { font-size: clamp(44px, 12vw, 58px); }
-  .hero-scene { height: clamp(300px, 88vw, 420px); }
-  .producer { width: 42%; height: 80%; right: 6%; bottom: 5%; }
-  .mixer3d {
-    height: clamp(78px, 22vw, 120px);
-    grid-template-columns: 44px 1fr 48px;
-    padding: 8px;
-    gap: 5px;
-  }
-  .channels { gap: 3px; }
-  .interface.if-a { transform: scale(.68) rotate(7deg); top: 5%; right: -6%; }
-  .interface.if-b { transform: scale(.68) rotate(-8deg); top: 40%; left: -7%; }
-  .interface.if-c { transform: scale(.62) rotate(4deg); bottom: 2%; right: -2%; }
-}
-@media (max-width: 380px) {
-  .hero-scene { height: clamp(260px, 84vw, 340px); }
-  .producer { width: 44%; height: 78%; }
-}
-
-/* -------------------------------------------------------------------
-   E) BUTTONS — guarantee they fit and stay tappable at any phone width
-   regardless of label length ("Download Curriculum" is the long one).
-   ------------------------------------------------------------------- */
-@media (max-width: 520px) {
-  .actions { flex-direction: column; align-items: stretch; gap: 10px; }
-  .actions .btn { width: 100%; justify-content: center; padding: 15px 18px; }
-}
-
-/* -------------------------------------------------------------------
-   F) COURSE CARDS — spacing that holds up once the grid collapses to
-   a single column on phones.
-   ------------------------------------------------------------------- */
-@media (max-width: 820px) {
-  .course-grid { gap: 14px; }
-  .course { padding: 22px; min-height: auto; }
-  .course-image { height: 190px; margin: 16px 0 20px; }
-}
-@media (max-width: 600px) {
-  .course { padding: 20px; }
-  .course h3 { font-size: 32px; }
-  .course-visual { height: 140px; }
-  .course-image { height: 160px; }
-}
-/* Nicer 2-up + 1 layout on iPad-width screens instead of one tall column. */
-@media (min-width: 821px) and (max-width: 1024px) {
-  .course-grid { grid-template-columns: 1fr 1fr; }
-  .course:nth-child(3) { grid-column: 1 / -1; }
-}
-
-/* -------------------------------------------------------------------
-   G) STUDIO / GALLERY — tighter, consistent card heights on small
-   phones so the photo grid doesn't run long and thin.
-   ------------------------------------------------------------------- */
-@media (max-width: 480px) {
-  .studio-photo-grid { gap: 12px; }
-  .studio-photo-grid > .studio-media-card { min-height: 240px; }
-  .studio-photo-stack { gap: 12px; }
-  .studio-detail-grid, .studio-video-grid { gap: 12px; }
-  .studio-detail-grid .studio-media-card { height: 220px; }
-  .studio-video-grid .studio-media-card { height: 220px; }
-}
-
-/* -------------------------------------------------------------------
-   H) FOUNDER CARDS — stack cleanly across the whole phone / small-
-   tablet range instead of squeezing into an awkward 2-column split
-   between 600–820px.
-   ------------------------------------------------------------------- */
-@media (max-width: 760px) {
-  .founder { grid-template-columns: 1fr; min-height: auto; padding: 16px; }
-  .founder-photo { min-height: 340px; height: 340px; }
-  .founder-copy { padding: 22px 14px 16px; }
-  .founder h3 { font-size: 34px; }
-}
-
-/* -------------------------------------------------------------------
-   I) CONTACT — calmer vertical rhythm on phones.
-   ------------------------------------------------------------------- */
-@media (max-width: 600px) {
-  section { padding: 72px 0; }
-  .contact-grid { gap: 26px; }
-  .contact-box { padding: 22px; }
-  .contact-row { padding: 15px 0; }
-}
-@media (max-width: 420px) {
-  .contact-box { padding: 18px; }
-}
-
-/* -------------------------------------------------------------------
-   J) CURRICULUM POPUPS — one clean set of breakpoints for the mascot
-   and dialog instead of the three overlapping ones this replaces.
-   ------------------------------------------------------------------- */
-@media (max-width: 1024px) {
-  .curriculum-character { right: -60px; width: 170px; height: 310px; }
-}
-@media (max-width: 820px) {
-  .curriculum-dialog {
-    width: min(94vw, 720px);
-    max-height: 88svh;
-    padding: 30px 24px;
-    overflow-y: auto;
-    overflow-x: visible;
-  }
-  .curriculum-character { right: -28px; width: 120px; height: 220px; opacity: .85; }
-  .curriculum-months { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 600px) {
-  .curriculum-modal { padding: 12px; }
-  .curriculum-dialog {
-    width: calc(100vw - 24px);
-    max-width: none;
-    max-height: 90svh;
-    padding: 26px 20px;
-    border-radius: 22px;
-  }
-  .curriculum-title { font-size: 32px; line-height: 1.05; padding-right: 30px; }
-  .curriculum-months { grid-template-columns: 1fr; gap: 10px; }
-  .curriculum-cta { flex-direction: column; gap: 9px; }
-  .curriculum-cta .btn { width: 100%; min-height: 46px; justify-content: center; }
-  /* Keep the mascot small, faded and out of the way of the text/CTA. */
-  .curriculum-character {
-    right: -10px;
-    bottom: 0;
-    top: auto;
-    width: 76px;
-    height: 140px;
-    opacity: .5;
-    z-index: 1;
-  }
-  .curriculum-dialog > *:not(.curriculum-character) { position: relative; z-index: 3; }
-}
-@media (max-width: 380px) {
-  .curriculum-character { width: 60px; height: 112px; opacity: .4; }
-  .curriculum-title { font-size: 28px; }
-}
-
-/* -------------------------------------------------------------------
-   K) CALLBACK / APPLY POPUP — fit real iPhone viewports, respect the
-   home-indicator safe area, and stop iOS Safari from auto-zooming on
-   focus (needs any input font-size >= 16px, applied unconditionally
-   rather than only inside one breakpoint).
-   ------------------------------------------------------------------- */
-.cb-field input { font-size: 16px; }
-#callbackModal .curriculum-dialog {
-  padding-bottom: calc(38px + env(safe-area-inset-bottom));
-}
-@media (max-width: 600px) {
-  #callbackModal .curriculum-dialog {
-    width: calc(100vw - 20px) !important;
-    max-width: none !important;
-    max-height: 90svh;
-    padding: 26px 20px !important;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
-    overflow-y: auto;
-  }
-  #callbackModal .cb-field input { font-size: 16px !important; }
-}
-
-/* -------------------------------------------------------------------
-   L) FLOATING "REQUEST A CALLBACK" BUTTON — clear the home indicator.
-   ------------------------------------------------------------------- */
-.callback-fab {
-  bottom: calc(22px + env(safe-area-inset-bottom));
-  right: calc(22px + env(safe-area-inset-right));
-}
-@media (max-width: 620px) {
-  .callback-fab {
-    bottom: calc(14px + env(safe-area-inset-bottom));
-    right: calc(14px + env(safe-area-inset-right));
-  }
-}
-
-/* -------------------------------------------------------------------
-   M) FOOTER — clear the home indicator on notched iPhones.
-   ------------------------------------------------------------------- */
-footer { padding-bottom: calc(35px + env(safe-area-inset-bottom)); }
 </style>
+
 </head>
 <body>
 
@@ -1357,8 +1095,7 @@ footer { padding-bottom: calc(35px + env(safe-area-inset-bottom)); }
    <div class="interface if-c"><div class="label">SESSION 01</div><div class="bars"><i style="height:75%"></i><i style="height:50%"></i><i style="height:90%"></i><i style="height:63%"></i><i style="height:42%"></i><i style="height:82%"></i></div></div>
 
    <div class="producer" id="producer">
-    <video class="character-video" src="assets/character-transparent.webm" autoplay muted loop playsinline webkit-playsinline preload="auto"
-      aria-label="Animated Audio Hub character"></video>
+    <canvas class="character-video" data-alpha-character width="720" height="1280" aria-label="Animated Audio Hub character"></canvas>
    </div>
 
    <div class="mixer3d">
@@ -1464,10 +1201,7 @@ footer { padding-bottom: calc(35px + env(safe-area-inset-bottom)); }
       <div class="media-caption">WORKSTATION / <b>MUSIC PRODUCTION</b></div>
     </article>
 
-    <article class="studio-media-card reveal">
-      <img loading="lazy" src="assets/studio-piano.png" alt="Studio piano and music production setup">
-      <div class="media-caption">STUDIO / <b>PIANO & KEYBOARD</b> · MUSICAL FOUNDATION</div>
-    </article>
+    
     
    
     <article class="studio-media-card reveal">
@@ -1564,24 +1298,13 @@ addEventListener('scroll',()=>{
  })
 },{passive:true});
 
-const menuBtn=document.querySelector('.menu'),navLinks=document.querySelector('.nav-links');
-function openMobileNav(){
- navLinks.style.display='flex';navLinks.style.position='absolute';
- navLinks.style.top=(nav.getBoundingClientRect().height+8)+'px';
- navLinks.style.left='0';navLinks.style.right='0';
- navLinks.style.padding='12px';navLinks.style.flexDirection='column';navLinks.style.alignItems='stretch';
- navLinks.style.background='rgba(5,5,5,.96)';navLinks.style.borderRadius='22px';
- menuBtn.setAttribute('aria-expanded','true');
-}
-function closeMobileNav(){
- navLinks.removeAttribute('style');
- menuBtn.setAttribute('aria-expanded','false');
-}
-function isMobileNavOpen(){return getComputedStyle(navLinks).position==='absolute'}
-menuBtn.addEventListener('click',()=>{ isMobileNavOpen()?closeMobileNav():openMobileNav(); });
-navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMobileNav));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&isMobileNavOpen()) closeMobileNav(); });
-addEventListener('resize',()=>{ if(innerWidth>980&&isMobileNavOpen()) closeMobileNav(); });
+document.querySelector('.menu').addEventListener('click',()=>{
+ const l=document.querySelector('.nav-links');
+ if(getComputedStyle(l).display==='none'){
+  l.style.display='flex';l.style.position='absolute';l.style.top='58px';l.style.left='0';l.style.right='0';
+  l.style.padding='12px';l.style.flexDirection='column';l.style.alignItems='stretch';l.style.background='rgba(5,5,5,.96)';l.style.borderRadius='22px';
+ }else l.removeAttribute('style');
+});
 </script>
 
 
@@ -1589,7 +1312,7 @@ addEventListener('resize',()=>{ if(innerWidth>980&&isMobileNavOpen()) closeMobil
 <div class="curriculum-modal" id="musicProductionModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="musicProductionTitle">
  <div class="curriculum-dialog">
 <div class="curriculum-character" aria-hidden="true">
-  <video src="assets/character-transparent.webm" autoplay muted loop playsinline></video>
+  <canvas class="character-video" data-alpha-character width="720" height="1280"></canvas>
 </div>
 
   <button class="curriculum-close" type="button" aria-label="Close">×</button>
@@ -1619,7 +1342,7 @@ addEventListener('resize',()=>{ if(innerWidth>980&&isMobileNavOpen()) closeMobil
 <div class="curriculum-modal" id="soundEngineeringModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="soundEngineeringTitle">
  <div class="curriculum-dialog">
 <div class="curriculum-character" aria-hidden="true">
-  <video src="assets/character-transparent.webm" autoplay muted loop playsinline></video>
+  <canvas class="character-video" data-alpha-character width="720" height="1280"></canvas>
 </div>
 
   <button class="curriculum-close" type="button" aria-label="Close">×</button>
@@ -1649,7 +1372,7 @@ addEventListener('resize',()=>{ if(innerWidth>980&&isMobileNavOpen()) closeMobil
 <div class="curriculum-modal" id="keyboardModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="keyboardTitle">
  <div class="curriculum-dialog">
   <div class="curriculum-character" aria-hidden="true">
-   <video src="assets/character-transparent.webm" autoplay muted loop playsinline></video>
+   <canvas class="character-video" data-alpha-character width="720" height="1280"></canvas>
   </div>
 
   <button class="curriculum-close" type="button" aria-label="Close">×</button>
@@ -1999,6 +1722,156 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.curriculum-modal.is-open').forEach(closeCurriculum);
   });
 });
+</script>
+<script>
+(function(){
+  // Two code paths, chosen by browser rather than by feature-probing:
+  //
+  // 1. Genuine Safari gets the canvas trick: a standard H.264/MP4 with color+alpha packed side by
+  //    side (left half = color, right half = grayscale alpha matte), decoded and recombined into
+  //    real per-pixel transparency on the canvas every frame. This is necessary because Safari
+  //    can't play WebM at all, and true HEVC-with-alpha .mov can only be produced with Apple's own
+  //    encoding tools (not available in this pipeline).
+  //
+  // 2. Every other browser (Chrome, Firefox, Edge, ...) gets a plain native <video> playing a
+  //    VP9-alpha WebM directly — no canvas, no pixel reads, faster, and immune to the file://
+  //    canvas-tainting restriction Chrome enforces (which blocked the canvas method there during
+  //    local testing before this site is deployed).
+  //
+  // We DON'T choose between these by asking the browser "can you play this WebM?"
+  // (canPlayType / trial-load) — WebKit has shipped Safari versions that answer that question
+  // optimistically (or even report valid decoded dimensions) without actually compositing the
+  // alpha channel, rendering an opaque frame instead of failing cleanly (bugs.webkit.org #216652,
+  // matching shaka-player / karakeep reports). Trusting that produced a white box in Safari.
+  // Trusting a plain feature-detect the other direction (assume canvas always works) broke Chrome
+  // when testing via file://. So instead we identify genuine Safari directly — the one browser
+  // that needs the canvas path — and give every other engine the native-video path unconditionally.
+  function isRealSafari(){
+    var ua = navigator.userAgent || '';
+    var vendor = navigator.vendor || '';
+    var isChromiumOrOtherEngine = /Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|OPR\/|Firefox|Android/.test(ua);
+    return vendor.indexOf('Apple') !== -1 && /Safari/.test(ua) && !isChromiumOrOtherEngine;
+  }
+
+  var slots = document.querySelectorAll('[data-alpha-character]');
+  if (!slots.length) return;
+
+  if (!isRealSafari()) {
+    slots.forEach(function(canvasEl){
+      var v = document.createElement('video');
+      v.className = canvasEl.className; // keep .character-video sizing/styling
+      v.autoplay = true;
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.setAttribute('webkit-playsinline', '');
+      v.setAttribute('preload', 'auto');
+      if (canvasEl.hasAttribute('aria-label')) {
+        v.setAttribute('aria-label', canvasEl.getAttribute('aria-label'));
+      }
+      var source = document.createElement('source');
+      source.src = 'assets/character-transparent.webm';
+      source.type = 'video/webm';
+      v.appendChild(source);
+      canvasEl.replaceWith(v);
+      v.play().catch(function(){});
+    });
+    return; // no canvas machinery needed on this path
+  }
+
+  // ---- Safari: packed H.264 + canvas recombination ----
+  var alphaSource = document.createElement('video');
+  alphaSource.muted = true;
+  alphaSource.loop = true;
+  alphaSource.playsInline = true;
+  alphaSource.setAttribute('webkit-playsinline', '');
+  alphaSource.setAttribute('preload', 'auto');
+  alphaSource.autoplay = true;
+  alphaSource.style.display = 'none';
+  alphaSource.setAttribute('aria-hidden', 'true');
+  var mp4Source = document.createElement('source');
+  mp4Source.src = 'assets/character-alpha.mp4';
+  mp4Source.type = 'video/mp4';
+  alphaSource.appendChild(mp4Source);
+  document.body.appendChild(alphaSource);
+
+  var FRAME_W = 720, FRAME_H = 1280;
+  var srcVideo = alphaSource;
+
+  var decode = document.createElement('canvas');
+  decode.width = FRAME_W * 2;
+  decode.height = FRAME_H;
+  var decodeCtx = decode.getContext('2d', { willReadFrequently: true });
+
+  var composite = document.createElement('canvas');
+  composite.width = FRAME_W;
+  composite.height = FRAME_H;
+  var compositeCtx = composite.getContext('2d');
+  var outBuf = null;
+
+  function isVisible(el){
+    return el.offsetParent !== null || el.getClientRects().length > 0;
+  }
+
+  var disabled = false; // set true after an unrecoverable error so we stop retrying every frame
+
+  function combine(){
+    decodeCtx.drawImage(srcVideo, 0, 0, decode.width, decode.height);
+    var colorData = decodeCtx.getImageData(0, 0, FRAME_W, FRAME_H);
+    var maskData = decodeCtx.getImageData(FRAME_W, 0, FRAME_W, FRAME_H);
+    if (!outBuf) outBuf = compositeCtx.createImageData(FRAME_W, FRAME_H);
+    var c = colorData.data, m = maskData.data, o = outBuf.data;
+    for (var i = 0; i < c.length; i += 4) {
+      o[i] = c[i]; o[i+1] = c[i+1]; o[i+2] = c[i+2]; o[i+3] = m[i];
+    }
+    compositeCtx.putImageData(outBuf, 0, 0);
+  }
+
+  function tick(){
+    if (disabled) return;
+    var targets = document.querySelectorAll('[data-alpha-character]');
+    if (srcVideo.readyState >= 2 && targets.length) {
+      var anyVisible = false;
+      for (var j = 0; j < targets.length; j++) {
+        if (isVisible(targets[j])) { anyVisible = true; break; }
+      }
+      if (anyVisible) {
+        try {
+          combine();
+          for (var k = 0; k < targets.length; k++) {
+            var t = targets[k];
+            if (!isVisible(t)) continue;
+            if (t.width !== FRAME_W) t.width = FRAME_W;
+            if (t.height !== FRAME_H) t.height = FRAME_H;
+            var tctx = t.getContext('2d');
+            tctx.clearRect(0, 0, FRAME_W, FRAME_H);
+            tctx.drawImage(composite, 0, 0);
+          }
+        } catch (err) {
+          disabled = true;
+          if (err && err.name === 'SecurityError') {
+            console.warn(
+              '[character-alpha] Canvas was tainted reading video pixel data (' + err.message + '). ' +
+              'This happens when the page is opened as a local file:// URL in Chrome/Chromium — ' +
+              'each file:// resource is treated as its own origin there. Serve this folder over http(s) ' +
+              '(e.g. `python3 -m http.server` or any real web host) and it will work correctly. ' +
+              'The animated character canvases have been disabled for this session to avoid repeated errors.'
+            );
+          } else {
+            console.warn('[character-alpha] Disabling animated character canvas after error:', err);
+          }
+          return;
+        }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    srcVideo.play().catch(function(){});
+    requestAnimationFrame(tick);
+  });
+})();
 </script>
 </body>
 </html>
