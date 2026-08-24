@@ -25,7 +25,7 @@ a{text-decoration:none;color:inherit}button{font:inherit}
 .brand span{font-size:14px}.gold{color:var(--gold2)}
 /* NAV */
 .nav{position:fixed;z-index:90;top:18px;left:50%;transform:translateX(-50%);width:min(1180px,calc(100% - 28px));padding:8px 10px 8px 13px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(5,5,5,.72);backdrop-filter:blur(22px);display:flex;align-items:center;justify-content:space-between;transition:.5s var(--ease)}
-.nav.scrolled{background:rgba(245,243,238,.92);color:#111;border-color:rgba(0,0,0,.08);box-shadow:0 15px 50px rgba(0,0,0,.15)}
+.nav.scrolled{background:rgba(5,5,5,.72);color:#fff;border-color:rgba(255,255,255,.13);box-shadow:none}
 .nav-links{display:flex;gap:3px;align-items:center}.nav-links a{font-size:12px;padding:10px 12px;border-radius:999px;transition:.3s}.nav-links a:hover{background:var(--gold);color:#111}
 .nav-cta{background:var(--gold);color:#111!important;font-weight:700}.menu{display:none;background:none;border:0;color:inherit;font-size:22px}
 
@@ -245,18 +245,23 @@ h2{font-family:"Manrope";font-size:clamp(48px,6.5vw,90px);line-height:.86;letter
 .video-badge{
   position:absolute;z-index:3;top:18px;right:18px;
   width:38px;height:38px;border:1px solid rgba(255,255,255,.25);
-  border-radius:50%;display:grid;place-items:center;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;gap:3px;
   background:rgba(0,0,0,.42);backdrop-filter:blur(8px);
   padding:0;appearance:none;-webkit-appearance:none;cursor:pointer;
 }
-/* Default = video is playing, icon shows two bars ("click to pause") */
-.video-badge:before{
+/* Default = video is playing, icon shows two bars ("click to pause"). Two real flex
+   items (:before/:after) so the pair centers as a whole, unlike a box-shadow duplicate
+   which doesn't count toward the element's own box and rendered off-center. */
+.video-badge:before,
+.video-badge:after{
   content:"";width:3px;height:12px;background:var(--gold2);
-  box-shadow:6px 0 0 var(--gold2);
 }
 /* .is-paused = video is paused, icon switches to a play triangle ("click to play") */
+.video-badge.is-paused:after{
+  content:none;
+}
 .video-badge.is-paused:before{
-  content:"";width:0;height:0;margin-left:2px;background:none;box-shadow:none;
+  width:0;height:0;margin-left:2px;background:none;
   border-left:8px solid var(--gold2);
   border-top:5px solid transparent;border-bottom:5px solid transparent;
 }
@@ -528,8 +533,8 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
   box-shadow:none!important;
   object-fit:contain;
 }
-.nav.scrolled .gold{color:#8B6412!important}
-.nav.scrolled .brand{color:#111!important}
+.nav.scrolled .gold{color:var(--gold2)!important}
+.nav.scrolled .brand{color:#fff!important}
 
 /* Character beside every course curriculum popup */
 .curriculum-dialog{overflow-y:auto;overflow-x:visible!important}
@@ -773,21 +778,6 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
     justify-content:center;
     width:42px;
     height:42px;
-  }
-
-  /* Keep the nav bar (and hamburger icon) looking the same as the top of the page
-     while scrolling, instead of switching to the light "scrolled" style. */
-  .nav.scrolled{
-    background:rgba(5,5,5,.72) !important;
-    color:#fff !important;
-    border-color:rgba(255,255,255,.13) !important;
-    box-shadow:none !important;
-  }
-  .nav.scrolled .gold{
-    color:var(--gold2) !important;
-  }
-  .nav.scrolled .brand{
-    color:#fff !important;
   }
 
   .hero-inner,
