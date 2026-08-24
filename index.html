@@ -247,9 +247,17 @@ h2{font-family:"Manrope";font-size:clamp(48px,6.5vw,90px);line-height:.86;letter
   width:38px;height:38px;border:1px solid rgba(255,255,255,.25);
   border-radius:50%;display:grid;place-items:center;
   background:rgba(0,0,0,.42);backdrop-filter:blur(8px);
+  padding:0;appearance:none;-webkit-appearance:none;cursor:pointer;
 }
+/* Default = video is playing, icon shows two bars ("click to pause") */
 .video-badge:before{
-  content:"";margin-left:2px;border-left:8px solid var(--gold2);
+  content:"";width:3px;height:12px;background:var(--gold2);
+  box-shadow:6px 0 0 var(--gold2);
+}
+/* .is-paused = video is paused, icon switches to a play triangle ("click to play") */
+.video-badge.is-paused:before{
+  content:"";width:0;height:0;margin-left:2px;background:none;box-shadow:none;
+  border-left:8px solid var(--gold2);
   border-top:5px solid transparent;border-bottom:5px solid transparent;
 }
 .studio-note{
@@ -403,6 +411,16 @@ h2{font-family:"Manrope";font-size:clamp(48px,6.5vw,90px);line-height:.86;letter
 footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.08)}.footer{display:flex;justify-content:space-between;gap:20px;align-items:center}.footer p{color:#555;font-size:10px;letter-spacing:.12em;margin-top:8px}.footer-links{display:flex;gap:18px;color:#777;font-size:11px}
 
 /* responsive */
+
+/* Laptop-range fix: the hero-scene graphic (mixer/room/cards) was tuned for wide
+   desktop monitors. Between the tablet breakpoint (980px) and ~1400px — the CSS
+   viewport width typical of 13-14" Windows laptops at their default display-scaling —
+   its rightward translateX(7%) push had no margin to work with, so the "MIX BUS" card
+   and channel meters clipped off the right edge. Scaling down from the left edge pulls
+   the whole composition back inside the viewport without touching any single element. */
+@media (max-width:1400px) and (min-width:981px){
+ .hero-scene{transform:translateX(0) scale(.86);transform-origin:left center}
+}
 
 @media(max-width:980px){
  .hero-scene{transform:translateX(3%)}
@@ -755,6 +773,21 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
     justify-content:center;
     width:42px;
     height:42px;
+  }
+
+  /* Keep the nav bar (and hamburger icon) looking the same as the top of the page
+     while scrolling, instead of switching to the light "scrolled" style. */
+  .nav.scrolled{
+    background:rgba(5,5,5,.72) !important;
+    color:#fff !important;
+    border-color:rgba(255,255,255,.13) !important;
+    box-shadow:none !important;
+  }
+  .nav.scrolled .gold{
+    color:var(--gold2) !important;
+  }
+  .nav.scrolled .brand{
+    color:#fff !important;
   }
 
   .hero-inner,
@@ -1171,11 +1204,11 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
  <div class="container">
   <div class="section-head reveal"><div><div class="kicker">03 / Professional Services</div><h2>FROM IDEA<br>TO FINAL MIX.</h2></div><p>From the first idea to the final mix, we handle everything with care and precision.</p></div>
   <div class="services-list">
-   <div class="service reveal"><span class="service-num">01</span><h3>Music Production</h3><p>Compose, arrange and produce music that fits your project perfectly.</p><span class="arr">↗︎</span></div>
-   <div class="service reveal"><span class="service-num">02</span><h3>Audio Mixing & Mastering</h3><p>Professional mixing and mastering for every speaker and platform.</p><span class="arr">↗︎</span></div>
-   <div class="service reveal"><span class="service-num">03</span><h3>Sound Design & Foley</h3><p>Custom sound effects for films, games and digital media.</p><span class="arr">↗︎</span></div>
-   <div class="service reveal"><span class="service-num">04</span><h3>Studio Acoustics</h3><p>Acoustic consultation and professional studio setup guidance.</p><span class="arr">↗︎</span></div>
-   <div class="service reveal"><span class="service-num">05</span><h3>AI Voice Cloning</h3><p>Advanced AI voice solutions for media, content and production.</p><span class="arr">↗︎</span></div>
+   <div class="service reveal"><span class="service-num">01</span><h3>Music Production</h3><p>Compose, arrange and produce music that fits your project perfectly.</p></div>
+   <div class="service reveal"><span class="service-num">02</span><h3>Audio Mixing & Mastering</h3><p>Professional mixing and mastering for every speaker and platform.</p></div>
+   <div class="service reveal"><span class="service-num">03</span><h3>Sound Design & Foley</h3><p>Custom sound effects for films, games and digital media.</p></div>
+   <div class="service reveal"><span class="service-num">04</span><h3>Studio Acoustics</h3><p>Acoustic consultation and professional studio setup guidance.</p></div>
+   <div class="service reveal"><span class="service-num">05</span><h3>AI Voice Cloning</h3><p>Advanced AI voice solutions for media, content and production.</p></div>
   </div>
  </div>
 </section>
@@ -1219,17 +1252,17 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
    <div class="studio-video-grid">
     <article class="studio-media-card reveal">
       <video src="assets/studio-motion-arrow.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      <span class="video-badge" aria-hidden="true"></span>
+      <button type="button" class="video-badge" aria-label="Pause video"></button>
       <div class="media-caption">UAD / <b>POWERED</b></div>
     </article>
     <article class="studio-media-card reveal">
       <video src="assets/studio-motion-solo.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      <span class="video-badge" aria-hidden="true"></span>
+      <button type="button" class="video-badge" aria-label="Pause video"></button>
       <div class="media-caption">UAD / <b>POWERED</b></div>
     </article>
     <article class="studio-media-card reveal">
       <video src="assets/studio-motion-s1.mp4" autoplay muted loop playsinline preload="metadata"></video>
-      <span class="video-badge" aria-hidden="true"></span>
+      <button type="button" class="video-badge" aria-label="Pause video"></button>
       <div class="media-caption">HANDS-ON / <b>DEDICATED SETUP</b></div>
     </article>
    </div>
@@ -1310,6 +1343,23 @@ document.querySelector('.menu').addEventListener('click',()=>{
   l.style.display='flex';l.style.position='absolute';l.style.top='58px';l.style.left='0';l.style.right='0';
   l.style.padding='12px';l.style.flexDirection='column';l.style.alignItems='stretch';l.style.background='rgba(5,5,5,.96)';l.style.borderRadius='22px';
  }else l.removeAttribute('style');
+});
+
+/* Gallery video badges: click to pause/resume the video in that card */
+document.querySelectorAll('.video-badge').forEach(badge=>{
+ const video=badge.previousElementSibling;
+ if(!video || video.tagName!=='VIDEO') return;
+ badge.addEventListener('click',()=>{
+  if(video.paused){video.play().catch(()=>{});}else{video.pause();}
+ });
+ const syncBadge=()=>{
+  const isPaused=video.paused;
+  badge.classList.toggle('is-paused',isPaused);
+  badge.setAttribute('aria-label',isPaused?'Play video':'Pause video');
+ };
+ video.addEventListener('play',syncBadge);
+ video.addEventListener('pause',syncBadge);
+ syncBadge();
 });
 </script>
 
