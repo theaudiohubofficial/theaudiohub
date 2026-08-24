@@ -472,7 +472,15 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
 
 <style>
 /* Mascot beside Music Production + Sound Engineering curriculum popups */
-.curriculum-dialog{overflow:visible!important;position:relative}
+/* overflow-x stays visible so the mascot artwork (positioned outside the
+   right edge via .curriculum-character{right:-150px}) isn't clipped.
+   overflow-y is intentionally left alone here (NOT forced visible) so the
+   dialog can still scroll vertically when its content is taller than
+   max-height — on shorter laptop screens the curriculum content is taller
+   than the viewport, and forcing overflow:visible on both axes made the
+   bottom of the dialog (including the "Book Free Consultation" button)
+   spill off-screen with no way to scroll down to it. */
+.curriculum-dialog{overflow-x:visible!important;position:relative}
 .curriculum-character{
   position:absolute;
   right:-150px;
