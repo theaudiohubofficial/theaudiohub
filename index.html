@@ -292,12 +292,17 @@ h2{font-family:"Manrope";font-size:clamp(48px,6.5vw,90px);line-height:.86;letter
   transition:background .5s var(--ease),backdrop-filter .5s var(--ease);
 }
 .curriculum-modal.is-open{background:rgba(0,0,0,.8);backdrop-filter:blur(16px)}
+/* Wraps .curriculum-dialog + .curriculum-character as siblings (see markup below)
+   so the mascot can bleed past the card's right edge without ever being clipped
+   by the dialog's own scroll box — see the full explanation further down where
+   .curriculum-character is defined. */
+.curriculum-dialog-wrap{position:relative;width:min(920px,100%)}
 .curriculum-dialog{
-  width:min(920px,100%);max-height:min(88vh,900px);overflow:auto;
+  width:100%;max-height:min(88vh,900px);overflow:auto;
   background:linear-gradient(145deg,#171717,#080808);color:#fff;
   border:1px solid rgba(217,168,46,.28);border-radius:28px;
   box-shadow:0 30px 100px rgba(0,0,0,.65);padding:38px;
-  position:relative;isolation:isolate;
+  position:relative;isolation:isolate;z-index:2;
   transform:translateY(34px) scale(.95);opacity:0;
   transition:transform .55s var(--ease),opacity .5s var(--ease);
 }
@@ -471,16 +476,19 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
 
 
 <style>
-/* Mascot beside Music Production + Sound Engineering curriculum popups */
-/* overflow-x stays visible so the mascot artwork (positioned outside the
-   right edge via .curriculum-character{right:-150px}) isn't clipped.
-   overflow-y is intentionally left alone here (NOT forced visible) so the
-   dialog can still scroll vertically when its content is taller than
-   max-height — on shorter laptop screens the curriculum content is taller
-   than the viewport, and forcing overflow:visible on both axes made the
-   bottom of the dialog (including the "Book Free Consultation" button)
-   spill off-screen with no way to scroll down to it. */
-.curriculum-dialog{overflow-x:visible!important;position:relative}
+/* Mascot beside Music Production + Sound Engineering curriculum popups.
+   .curriculum-character now lives OUTSIDE .curriculum-dialog — as a sibling
+   inside .curriculum-dialog-wrap (see markup) — instead of nested inside it.
+   It used to be a child of the dialog, which meant it could only bleed past
+   the card's right edge if the dialog used overflow:visible; but the dialog
+   also needs overflow-y:auto so it can scroll on shorter screens (the "Book
+   Free Consultation" button was landing off-screen otherwise), and a single
+   element can't have overflow-x:visible with overflow-y:auto at the same
+   time — browsers silently turn the "visible" axis into "auto" too the
+   moment the other axis isn't visible, which clipped the mascot into an
+   ugly sliver instead of a clean bleed. Moving it to a sibling avoids the
+   conflict entirely: the dialog scrolls its own content, the mascot is
+   positioned against the wrapper and is never inside anything that clips. */
 .curriculum-character{
   position:absolute;
   right:-150px;
@@ -545,7 +553,6 @@ footer{background:#050505;padding:35px 0;border-top:1px solid rgba(255,255,255,.
 .nav.scrolled .brand{color:#fff!important}
 
 /* Character beside every course curriculum popup */
-.curriculum-dialog{overflow-y:auto;overflow-x:visible!important}
 .curriculum-character{
   position:absolute;right:-145px;bottom:-8px;width:210px;height:370px;
   z-index:5;pointer-events:none;opacity:0;
@@ -1364,11 +1371,11 @@ document.querySelectorAll('.video-badge').forEach(badge=>{
 
 
 <div class="curriculum-modal" id="musicProductionModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="musicProductionTitle">
- <div class="curriculum-dialog">
+ <div class="curriculum-dialog-wrap">
 <div class="curriculum-character" aria-hidden="true">
   <canvas class="character-video" data-alpha-character width="720" height="1280"></canvas>
 </div>
-
+ <div class="curriculum-dialog">
   <button class="curriculum-close" type="button" aria-label="Close">×</button>
   <div class="curriculum-badge"><i></i>Limited Seats · Next Batch Forming</div>
   <div class="curriculum-kicker">Certificate Course</div>
@@ -1392,13 +1399,14 @@ document.querySelectorAll('.video-badge').forEach(badge=>{
   </div>
  </div>
 </div>
+</div>
 
 <div class="curriculum-modal" id="soundEngineeringModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="soundEngineeringTitle">
- <div class="curriculum-dialog">
+ <div class="curriculum-dialog-wrap">
 <div class="curriculum-character" aria-hidden="true">
   <canvas class="character-video" data-alpha-character width="720" height="1280"></canvas>
 </div>
-
+ <div class="curriculum-dialog">
   <button class="curriculum-close" type="button" aria-label="Close">×</button>
   <div class="curriculum-badge"><i></i>Limited Seats · Next Batch Forming</div>
   <div class="curriculum-kicker">Certificate Course</div>
@@ -1422,13 +1430,14 @@ document.querySelectorAll('.video-badge').forEach(badge=>{
   </div>
  </div>
 </div>
+</div>
 
 <div class="curriculum-modal" id="keyboardModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="keyboardTitle">
- <div class="curriculum-dialog">
+ <div class="curriculum-dialog-wrap">
   <div class="curriculum-character" aria-hidden="true">
    <canvas class="character-video" data-alpha-character width="720" height="1280"></canvas>
   </div>
-
+ <div class="curriculum-dialog">
   <button class="curriculum-close" type="button" aria-label="Close">×</button>
   <div class="curriculum-badge"><i></i>Limited Seats · Next Batch Forming</div>
   <div class="curriculum-kicker">Keyboard &amp; Piano Program</div>
@@ -1457,6 +1466,7 @@ document.querySelectorAll('.video-badge').forEach(badge=>{
    <a class="btn ghost" href="#contact" data-close-modal>Book Free Consultation</a>
   </div>
  </div>
+</div>
 </div>
 
 <!-- REQUEST A CALLBACK — shown on exit intent / fast swipe-away, and always available via the floating button -->
